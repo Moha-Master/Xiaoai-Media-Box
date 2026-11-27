@@ -1,0 +1,67 @@
+#!/bin/sh /etc/rc.common
+# state_reporter — 小爱音箱设备侧状态主动上报守护进程
+#
+# 作用：把 mediaplayer 的播放状态主动 POST 给 xiaoai-mb，让服务端不必再用
+# SSH/云端轮询去问"现在播到哪了"。刷机设备上这是 xiaoai-mb 的推荐状态通道
+# （status_mode=push）。
+#
+# START=78：必须晚于 mediaplayer(70)，否则 ubus 对象还不存在。
+# 实测本固件：wireless=61、ha_agent=54、pns=55、mediaplayer=70、dlna_renderer=75、
+# mibrain_service=96 —— 78 落在 mediaplayer 之后，且不与任何既有服务冲突。
+#
+# 用 procd 而不是 start-stop-daemon，两个原因：
+#   1. `start-stop-daemon -K -x /bin/sh` 会匹配**所有** /bin/sh 进程，
+#      包括其它 /etc/init.d/* 脚本 —— 刷完机后最容易炸的就是这种误杀；
+#      procd_kill 按服务名收，不会牵连别人。
+#   2. respawn 提供进程级看门狗（脚本退出即重启）。注意它救不了"卡死"，
+#      卡死靠脚本里的 `ubus -t` 超时来自愈。
+#
+# 配置只有一处：/data/etc/state_reporter.conf（由 state_reporter.sh 自己 source，
+# 沿用本固件 ha_agent.conf / dlna_renderer.conf 的既有约定）。
+# 这个 init.d **不读配置**，免得两处各读各的、改一处不生效。
+#
+#   url=http://192.168.1.10:8088/api/device/state?speaker=living
+#   interval=5            # 本地采样间隔（秒）
+#   ubus_timeout=5        # ubus call 超时（秒），必须带，否则 mediaplayer 卡死会挂住整个 daemon
+#   hb_play=15            # 播放中心跳（秒）
+#   hb_idle=30            # 暂停/空闲心跳（秒）
+#   seek_tol=8000         # 位置异常容差（毫秒）
+#
+# ⚠️ url 里的 speaker 必须与服务端 config.json 里该音箱的 id 一致；不一致会一直
+#    收到 HTTP 400，而脚本静默丢弃 —— 现象是服务端显示"设备离线"。
+# ⚠️ 服务端那侧的静默阈值是由 hb_play/hb_idle 推出来的（max(3×hb_play, 2×hb_idle)），
+#    改了这里要同步改服务端 speakers[].report_hb_play / report_hb_idle。
+#
+# 改完配置：/etc/init.d/state_reporter restart
+# 开机自启：/etc/rc.d/S78state_reporter → ../init.d/state_reporter（刷镜像时记得跑
+# 固件那边的 check.py 验一遍 rc.d 链接完整性）
+
+START=78
+USE_PROCD=1
+
+PROG=state_reporter
+SCRIPT=/usr/bin/state_reporter.sh
+
+start_service() {
+    logger -t "$PROG-init" -p 6 "start $SCRIPT"
+
+    if [ ! -f "$SCRIPT" ]; then
+        logger -t "$PROG-init" -p 3 "!! 缺少 $SCRIPT"
+        return 1
+    fi
+
+    procd_open_instance "$PROG"
+    # 不传 url 参数：让脚本自己从 /data/etc/state_reporter.conf 读。
+    # url 里有 ? 和 &，拼进命令行会被 shell 当成 glob / 后台符，是白踩的坑。
+    procd_set_param command /bin/sh "$SCRIPT"
+    procd_set_param respawn 3600 5 0
+    procd_set_param stdout 0
+    procd_set_param stderr 0
+    procd_set_param nice 10
+    procd_close_instance
+}
+
+stop_service() {
+    logger -t "$PROG-init" -p 6 "stop"
+    procd_kill "$PROG"
+}

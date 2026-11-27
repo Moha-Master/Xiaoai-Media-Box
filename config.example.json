@@ -1,0 +1,39 @@
+{
+  "listen": "0.0.0.0:8088",
+  "public_base": "http://192.168.1.10:8088",
+  "cookie_file": "cookie.json",
+  "quality": "exhigh",
+  "window": 20,
+  "loop": "list",
+  "stream_mode": "redirect",
+  "queue_persist": true,
+  "hotmode_extend_below": 0,
+  "hotmode_extend_max_fail": 3,
+  "xiaomi": {
+    "user": "",
+    "device_id": "",
+    "token_file": ".mina_token.json"
+  },
+  "speakers": [
+    {
+      "id": "living",
+      "name": "客厅",
+      "control": "ssh",
+      "ssh_host": "root@192.168.1.20",
+      "ssh_key": "",
+      "media": "common",
+      "use_window": true,
+      "status_poll": 60,
+      "device_id": ""
+    },
+    {
+      "id": "bedroom",
+      "name": "卧室",
+      "control": "cloud",
+      "device_id": "",
+      "media": "app_ios",
+      "use_window": true,
+      "status_poll": 60
+    }
+  ]
+}

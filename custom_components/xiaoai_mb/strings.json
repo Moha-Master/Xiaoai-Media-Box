@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "连接到 xiaoai-mb",
+        "description": "填写 xiaoai-mb 的服务地址，下一步会列出所有音箱供多选。",
+        "data": {
+          "url": "服务地址"
+        }
+      },
+      "speakers": {
+        "title": "选择音箱",
+        "description": "发现 {count} 台音箱。勾选要加入 Home Assistant 的，每台会生成一个独立设备。",
+        "data": {
+          "speakers": "音箱"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "连接失败，请检查地址和 xiaoai-mb 是否运行",
+      "no_speakers": "没有可选的音箱"
+    },
+    "abort": {
+      "already_configured": "这个 xiaoai-mb 地址已经配置过了"
+    }
+  }
+}

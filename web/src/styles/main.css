@@ -1,0 +1,87 @@
+/* 全局样式。非 layer 的规则天然盖过 Vuetify 的分层样式，所以这里只放真正的全局修正。 */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* 中文字优先走系统字体，别为了 Roboto 再塞 500KB 字体文件 */
+  font-family: system-ui, -apple-system, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans CJK SC', sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+#app,
+.v-application {
+  height: 100%;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+/* 播放器实测高度：PlayerBar 挂载后用 ResizeObserver 覆盖（桌面约 84px，移动端更高） */
+:root {
+  --mb-bar-height: 84px;
+}
+
+.v-application__wrap {
+  height: 100%;
+  max-height: 100dvh;
+  overflow: hidden;
+  /* 底部整条让给贯穿全宽的固定播放器：v-main / 侧栏内容都止于播放器上沿 */
+  padding-bottom: var(--mb-bar-height);
+}
+
+.v-main {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+/* 深色底上的滚动条：默认那条白条很难看 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mb-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.mb-dim {
+  opacity: 0.62;
+}
+
+/* flex 子项默认 min-width:auto 会顶破容器，截断文本的外层都要它 */
+.min-w-0 {
+  min-width: 0;
+}
+
+.mb-mono {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* 可拖拽的队列行：拖起来时给一点点反馈 */
+.mb-dragging {
+  opacity: 0.45;
+}
+
+.mb-cover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}

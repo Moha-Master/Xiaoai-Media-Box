@@ -1,0 +1,31 @@
+# /data/etc/state_reporter.conf
+#
+# 由 /usr/bin/state_reporter.sh 用 `.`（source）直接读，所以这里**只能赋值**，
+# 不要写命令、不要写 if。改完执行：/etc/init.d/state_reporter restart
+#
+# 值都要加引号：url 里的 ? 和 & 不加引号会被 shell 当 glob / 后台符。
+
+# 服务端接收端点。speaker= 必须与 xiaoai-mb config.json 里该音箱的 id 一致，
+# 否则会一直收到 HTTP 400（脚本静默丢弃，现象是服务端显示"设备离线"）。
+url="http://192.168.1.10:8088/api/device/state?speaker=living"
+
+# 本地采样间隔（秒）。这是"外部操作最坏多久被发现"的上限：
+# 机身按键、米家拖进度条、DLNA 投屏抢播都在这个节奏里被捕捉。
+# 不建议小于 2 秒：服务端有两处判定用"刚起播"窗口（repeat=none 的绕回停止、
+# 心动续杯的重推时机），采样间隔一变，那两个窗口要跟着放宽。
+interval=5
+
+# ubus call 超时（秒）。必须带：mediaplayer 卡死时不带超时的 ubus call 会永久挂起，
+# daemon 进程还在、pidfile 还在，但再也不上报（实测 SIGSTOP mediaplayer 可复现）。
+ubus_timeout=5
+
+# 心跳（秒）：没有任何变化时也发一次，用来纠服务端本地插值的漂移，
+# 同时是服务端的存活依据。
+hb_play=15
+hb_idle=30
+
+# 位置异常容差（毫秒）。播放中 position 的增量与真实经过时间相差超过这个值
+# 就当作有人在 seek，立即上报。调小会更灵敏但可能因设备时钟抖动误报；
+# 调大则 seek 反馈变慢。服务端用它做 seek 复核的容差，改动要同步
+# speakers[].report_seek_tol_ms。
+seek_tol=8000

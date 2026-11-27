@@ -1,0 +1,27 @@
+# 构建产物
+bin/
+xiaoai-ncm
+xiaoai-ncm.exe
+
+# 运行时数据（含登录凭据，绝不能提交）
+config.json
+cookie.json
+cookie.json.key
+.mina_token.json
+.mina_token.json.key
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.ruff_cache/
+
+# 前端
+web/node_modules/
+web/.vite/
+internal/app/web/dist/*
+!internal/app/web/dist/.gitkeep
+
+# 本地指令
+AGENTS.md
+.playwright-cli/

@@ -1,0 +1,10 @@
+{
+  "domain": "xiaoai_mb",
+  "name": "Xiaoai Media Box",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/Moha-Master/Xiaoai-Media-Box",
+  "iot_class": "local_push",
+  "requirements": [],
+  "version": "0.9.0"
+}

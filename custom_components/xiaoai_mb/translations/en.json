@@ -1,0 +1,27 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to xiaoai-mb",
+        "description": "Enter the xiaoai-mb base URL. The next step lists all speakers for multi-select.",
+        "data": {
+          "url": "Service URL"
+        }
+      },
+      "speakers": {
+        "title": "Select speakers",
+        "description": "Found {count} speaker(s). Pick the ones to add; each becomes a separate device.",
+        "data": {
+          "speakers": "Speakers"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect. Check the URL and that xiaoai-mb is running.",
+      "no_speakers": "No speakers available."
+    },
+    "abort": {
+      "already_configured": "This xiaoai-mb URL is already configured."
+    }
+  }
+}
